@@ -2,6 +2,7 @@ langchain
 langchain-community
 faiss-cpu
 pypdf
+pdfplumber
 tiktoken
 sentence-transformers
 python-dotenv
