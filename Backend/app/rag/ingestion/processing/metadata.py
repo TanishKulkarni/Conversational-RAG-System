@@ -1,26 +1,39 @@
+# app/rag/ingestion/processing/metadata.py
+
 from typing import List
 from langchain_core.documents import Document
 
+from app.rag.ingestion.processing.categorizer import detect_category
+from app.rag.ingestion.processing.section_parser import extract_section_title
+
+
 def enrich_metadata(documents: List[Document]) -> List[Document]:
     """
-    Add useful metadata for retrieval and citation.
+    Attach rich metadata to each chunk.
     """
-    for doc in documents:
-        # Estimate length
+
+    for i, doc in enumerate(documents):
+
+        source_file = doc.metadata.get("source_file", "unknown")
+
+        # Document name
+        doc.metadata["document_name"] = source_file
+
+        # Category
+        doc.metadata["category"] = detect_category(source_file)
+
+        # Section title
+        doc.metadata["section_title"] = extract_section_title(
+            doc.page_content
+        )
+
+        # Chunk position
+        doc.metadata["chunk_index"] = i
+
+        # Character length
         doc.metadata["char_length"] = len(doc.page_content)
 
-        # Identify policy category from filename
-        source = doc.metadata.get("source_file", "").lower()
-
-        if "attendance" in source:
-            doc.metadata["category"] = "attendance"
-        elif "exam" in source:
-            doc.metadata["category"] = "examination"
-        elif "scholarship" in source:
-            doc.metadata["category"] = "scholarship"
-        elif "disciplinary" in source:
-            doc.metadata["category"] = "disciplinary"
-        else:
-            doc.metadata["category"] = "academic"
+        # Page number (if available from PDF loader)
+        doc.metadata["page_number"] = doc.metadata.get("page", None)
 
     return documents
