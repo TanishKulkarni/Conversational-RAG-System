@@ -2,6 +2,8 @@
 
 from pathlib import Path
 from app.rag.ingestion.loaders.universal_loader import load_documents
+from app.rag.ingestion.processing.chunker import chunk_documents
+from app.rag.ingestion.processing.metadata import enrich_metadata
 
 
 BASE_DIR = Path(__file__).resolve().parents[3]
@@ -16,12 +18,19 @@ def run_text_extraction():
 
     print(f"\nLoaded {len(documents)} documents/pages.")
 
-    if documents:
-        print("\nSample content:")
-        print(documents[0].page_content[:500])
-        print("\nMetadata:", documents[0].metadata)
+    # Chunking
+    chunked_docs = chunk_documents(documents)
+    print(f"Created {len(chunked_docs)} chunks")
 
-    return documents
+    # Metadata enrichment
+    chunked_docs = enrich_metadata(chunked_docs)
+
+    if chunked_docs:
+        print("\nSample chunk:")
+        print(chunked_docs[0].page_content)
+        print("\nMetadata:", chunked_docs[0].metadata)
+
+    return chunked_docs
 
 
 if __name__ == "__main__":
