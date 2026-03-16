@@ -10,4 +10,8 @@ def load_index(path: str, embeddings):
     """
     Load existing FAISS index
     """
-    return FAISS.load_local(path, embeddings)
+    return FAISS.load_local(
+    path,
+    embeddings,
+    allow_dangerous_deserialization=True
+)

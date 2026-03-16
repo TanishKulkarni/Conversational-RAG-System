@@ -10,6 +10,7 @@ from app.rag.ingestion.vectorstore.store import create_files_index
 from app.rag.ingestion.vectorstore.manager import save_index
 
 
+
 BASE_DIR = Path(__file__).resolve().parents[3]
 RAW_DATA_DIR = BASE_DIR / "data" / "raw"
 VECTORSTORE_DIR = BASE_DIR / "data" / "vectorstore" / "faiss_index"
