@@ -8,7 +8,7 @@ from app.rag.ingestion.processing.metadata import enrich_metadata
 from app.rag.ingestion.embedding.embedder import get_embedding_model
 from app.rag.ingestion.vectorstore.store import create_files_index
 from app.rag.ingestion.vectorstore.manager import save_index
-
+    
 
 
 BASE_DIR = Path(__file__).resolve().parents[3]
