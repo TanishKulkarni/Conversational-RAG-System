@@ -716,7 +716,7 @@ MemoryError: Unable to allocate memory
 
 ## 👥 Contributors
 
-- Development Team - Bachelor's Degree in AI
+- Development Team 
 
 ---
 
