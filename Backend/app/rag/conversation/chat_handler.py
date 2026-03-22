@@ -29,5 +29,6 @@ def handle_chat(session_id: str, user_message: str):
         "question": user_message,
         "rewritten_query": standalone_query,
         "answer": answer,
-        "sources": [d.metadata for d in docs]
+        "sources": [d.metadata for d in docs],
+        "docs": docs
     }
