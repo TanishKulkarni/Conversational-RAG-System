@@ -1,15 +1,11 @@
-from langchain_classic.memory import ConversationSummaryBufferMemory
-from app.rag.generation.llm import get_llm
+from langchain_classic.memory import ConversationBufferMemory
 
 def create_memory():
     """
-    Create summarizing memory for a conversation session.
+    Create lightweight memory for a conversation session.
     """
-
-    memory = ConversationSummaryBufferMemory(
-        llm=get_llm(),
-        max_token_limit=2000,
-        return_messages=True
+    memory = ConversationBufferMemory(
+        return_messages=False
     )
 
     return memory

@@ -6,3 +6,7 @@ pdfplumber
 tiktoken
 sentence-transformers
 python-dotenv
+uvicorn
+fastapi
+langchain-ollama
+python-multipart

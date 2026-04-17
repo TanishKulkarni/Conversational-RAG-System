@@ -1,9 +1,9 @@
 from typing import Dict
-from langchain_classic.memory import ConversationSummaryBufferMemory
+from langchain_classic.memory import ConversationBufferMemory
 from app.rag.conversation.memory import create_memory
 
 # In-Memory session store(simple version)
-sessions: Dict[str, ConversationSummaryBufferMemory] = {}
+sessions: Dict[str, ConversationBufferMemory] = {}
 
 def get_session_memory(session_id: str):
     if session_id not in sessions:

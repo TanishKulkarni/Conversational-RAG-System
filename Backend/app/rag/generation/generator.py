@@ -11,12 +11,13 @@ def format_context(docs: List[Document]) -> str:
 
     context_parts = []
 
-    for doc in docs:
+    for doc in docs[:2]:
         source = doc.metadata.get("document_name", "Unknown")
         section = doc.metadata.get("section_title", "Unknown section")
+        content = doc.page_content[:1200]
 
         context_parts.append(
-            f"[Source: {source} | Section: {section}]\n{doc.page_content}"
+            f"[Source: {source} | Section: {section}]\n{content}"
         )
     return "\n\n".join(context_parts)
 

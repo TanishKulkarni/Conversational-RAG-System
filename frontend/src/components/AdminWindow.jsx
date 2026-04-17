@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
+import { fetchFailedQueries as fetchFailedQueriesApi, uploadDocument } from "../services/api"
 
 export default function AdminWindow() {
   const [failedQueries, setFailedQueries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadMessage, setUploadMessage] = useState("")
 
   useEffect(() => {
-    fetchFailedQueries()
+    loadFailedQueries()
   }, [])
 
-  const fetchFailedQueries = async () => {
+  const loadFailedQueries = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://127.0.0.1:8000/admin/failed-queries")
-      setFailedQueries(response.data)
+      const data = await fetchFailedQueriesApi()
+      setFailedQueries(data)
       setError(null)
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to fetch failed queries")
@@ -23,14 +25,43 @@ export default function AdminWindow() {
     }
   }
 
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setUploading(true)
+      setUploadMessage("")
+      const result = await uploadDocument(file)
+      setUploadMessage(`Uploaded: ${result.filename}`)
+    } catch (err) {
+      setUploadMessage(err.response?.data?.detail || "Upload failed")
+    } finally {
+      setUploading(false)
+      e.target.value = ""
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b">
         <h1 className="text-xl font-bold">Admin Dashboard</h1>
-        <p className="text-gray-600">Failed Queries Log</p>
+        <p className="text-gray-600">Upload policies and review failed queries</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
+        <div className="bg-white p-4 rounded border mb-4">
+          <h2 className="font-semibold mb-2">Upload New Policy</h2>
+          <input
+            type="file"
+            onChange={handleUpload}
+            disabled={uploading}
+            className="block w-full text-sm"
+          />
+          {uploading && <p className="text-sm text-gray-500 mt-2">Uploading and indexing document...</p>}
+          {uploadMessage && <p className="text-sm mt-2">{uploadMessage}</p>}
+        </div>
+
         {loading && <p>Loading failed queries...</p>}
 
         {error && (
@@ -63,7 +94,7 @@ export default function AdminWindow() {
 
         <div className="mt-4">
           <button
-            onClick={fetchFailedQueries}
+            onClick={loadFailedQueries}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Refresh
