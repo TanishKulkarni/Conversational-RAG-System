@@ -98,8 +98,8 @@ A modern AI-powered conversational assistant that helps students, faculty, and s
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │        Data Layer (Persistence & Storage)                │   │
 │  │  ┌──────────────┐  ┌────────────┐  ┌──────────────┐    │   │
-│  │  │ FAISS Vector │  │  Session   │  │   Ollama     │    │   │
-│  │  │   Store      │  │   Store    │  │   (Mistral)  │    │   │
+│  │  │ FAISS Vector │  │  Session   │  │   Groq       │    │   │
+│  │  │   Store      │  │   Store    │  │   (Llama 3)  │    │   │
 │  │  └──────────────┘  └────────────┘  └──────────────┘    │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                   │
@@ -108,8 +108,8 @@ A modern AI-powered conversational assistant that helps students, faculty, and s
 ┌─────────────────────────────────────────────────────────────────┐
 │              External Services & Infrastructure                  │
 │  ┌──────────────────┐  ┌────────────────┐  ┌─────────────────┐ │
-│  │ Ollama LLM       │  │ Vector DB      │  │ Document Store  │ │
-│  │ (Mistral Model)  │  │ (FAISS)        │  │ (Processed Docs)│ │
+│  │ Groq API         │  │ Vector DB      │  │ Document Store  │ │
+│  │ (Llama 3 Models) │  │ (FAISS)        │  │ (Processed Docs)│ │
 │  └──────────────────┘  └────────────────┘  └─────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -129,7 +129,7 @@ Document Chunk Retrieval
         ↓
 Prompt Construction (LLM)
         ↓
-Local LLM Inference (Ollama - Mistral)
+Cloud LLM Inference (Groq - Llama 3)
         ↓
 Response Formatting
         ↓
@@ -146,7 +146,7 @@ User Response + Citations
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
 | **Framework** | FastAPI | Modern async web framework |
-| **LLM** | Ollama (Mistral) | Local language model inference |
+| **LLM** | Groq (Llama 3) | Fast cloud language model inference |
 | **Embeddings** | Sentence Transformers | Document and query embeddings |
 | **Vector DB** | FAISS (CPU) | Fast similarity search |
 | **RAG** | LangChain | Orchestration and abstractions |
@@ -677,7 +677,56 @@ npm run build
 
 ---
 
-## 🚨 Troubleshooting
+## � Deployment
+
+### Backend Deployment on Render
+
+1. **Prerequisites**:
+   - Groq API key (get from [Groq Console](https://console.groq.com/keys))
+   - Render account (free tier available)
+
+2. **Deploy to Render**:
+   ```bash
+   # Option 1: Using Render Dashboard
+   # 1. Go to https://render.com
+   # 2. Connect your GitHub repository
+   # 3. Create a new Web Service
+   # 4. Set build command: pip install -r requirements.txt
+   # 5. Set start command: uvicorn app.api.main:app --host 0.0.0.0 --port $PORT
+
+   # Option 2: Using render.yaml (Blueprints)
+   # The render.yaml file is already configured in the Backend directory
+   ```
+
+3. **Environment Variables** (set in Render dashboard):
+   ```
+   GROQ_API_KEY=your_groq_api_key_here
+   GROQ_MODEL=llama3-8b-8192
+   GROQ_TEMPERATURE=0.2
+   ALLOWED_ORIGINS=https://your-frontend-domain.onrender.com,https://your-backend-domain.onrender.com
+   ```
+
+4. **Frontend Deployment**:
+   ```bash
+   cd frontend
+   npm run build
+   # Deploy the dist/ folder to any static hosting service (Netlify, Vercel, etc.)
+   ```
+
+### Alternative Deployment Options
+
+- **Railway**: Supports Ollama (if you want to keep local LLM)
+- **DigitalOcean App Platform**: Good for full-stack deployments
+- **AWS/GCP/Azure**: For enterprise deployments
+
+### Cost Estimation (Render Free Tier)
+- **Backend**: ~$0/month (750 hours free)
+- **Frontend**: ~$0/month (static hosting)
+- **Groq**: ~$0.10-0.20/1M tokens (very affordable)
+
+---
+
+## �🚨 Troubleshooting
 
 ### Ollama Connection Error
 ```

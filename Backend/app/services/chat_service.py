@@ -13,5 +13,7 @@ def process_chat(session_id: str, message: str):
         "citations": result.get("sources", []),
         "confidence": confidence,
         "escalation": result.get("escalation"),
+        "retrieval_type": result.get("retrieval_type"),
+        "applied_filter": result.get("applied_filter"),
         "latency_ms": latency_ms,
     }

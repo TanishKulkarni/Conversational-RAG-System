@@ -1,22 +1,23 @@
 from functools import lru_cache
 import os
-from langchain_ollama import ChatOllama
+from langchain_groq import ChatGroq
 
 @lru_cache(maxsize=1)
 def get_llm():
     """
-    Load local LLM via Ollama.
+    Load Groq LLM for cloud deployment.
     """
-    model_name = os.getenv("OLLAMA_MODEL", "llama2")
-    base_url = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
-    num_predict = int(os.getenv("OLLAMA_NUM_PREDICT", "96"))
-    num_ctx = int(os.getenv("OLLAMA_NUM_CTX", "1024"))
-    llm = ChatOllama(
+    model_name = os.getenv("GROQ_MODEL", "llama3-8b-8192")
+    api_key = os.getenv("GROQ_API_KEY")
+    temperature = float(os.getenv("GROQ_TEMPERATURE", "0.2"))
+
+    if not api_key:
+        raise ValueError("GROQ_API_KEY environment variable is required")
+
+    llm = ChatGroq(
         model=model_name,
-        base_url=base_url,
-        temperature=0.2,
-        num_predict=num_predict,
-        num_ctx=num_ctx,
+        api_key=api_key,
+        temperature=temperature,
     )
 
     return llm

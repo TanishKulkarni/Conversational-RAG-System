@@ -1,7 +1,7 @@
 from typing import List
 from langchain_core.documents import Document
 
-SIMILARITY_THREHOLD = 0.3
+SIMILARITY_THRESHOLD = 1.2
 
 def is_no_answer_case(docs: List[Document]) -> bool:
     """
@@ -17,7 +17,8 @@ def is_no_answer_case(docs: List[Document]) -> bool:
         if "score" in doc.metadata
     ]
 
-    if scores and max(scores) < SIMILARITY_THREHOLD:
+    # Lower score means closer match for FAISS L2 distance.
+    if scores and min(scores) > SIMILARITY_THRESHOLD:
         return True
     
     # Check for extreme short text

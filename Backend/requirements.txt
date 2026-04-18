@@ -6,7 +6,7 @@ pdfplumber
 tiktoken
 sentence-transformers
 python-dotenv
-uvicorn
+uvicorn[standard]
 fastapi
-langchain-ollama
+langchain-groq
 python-multipart

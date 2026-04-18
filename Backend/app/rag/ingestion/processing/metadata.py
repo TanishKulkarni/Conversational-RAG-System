@@ -1,6 +1,7 @@
 # app/rag/ingestion/processing/metadata.py
 
 from typing import List
+import re
 from langchain_core.documents import Document
 
 from app.rag.ingestion.processing.categorizer import detect_category
@@ -35,5 +36,25 @@ def enrich_metadata(documents: List[Document]) -> List[Document]:
 
         # Page number (if available from PDF loader)
         doc.metadata["page_number"] = doc.metadata.get("page", None)
+
+        # Academic year, e.g., "2024" from filename/content
+        match = re.search(r"(20\d{2})", source_file) or re.search(r"(20\d{2})", doc.page_content[:300])
+        doc.metadata["academic_year"] = match.group(1) if match else "unknown"
+
+        # Lightweight department tagging by text hints
+        text = doc.page_content.lower()
+        if "computer science" in text or " cse " in f" {text} ":
+            department = "computer science"
+        elif "artificial intelligence" in text or " ai " in f" {text} ":
+            department = "artificial intelligence"
+        elif "electronics" in text or " ece " in f" {text} ":
+            department = "electronics"
+        elif "civil" in text:
+            department = "civil"
+        elif "mechanical" in text:
+            department = "mechanical"
+        else:
+            department = "all"
+        doc.metadata["department"] = department
 
     return documents
