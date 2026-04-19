@@ -1,36 +1,39 @@
-export default function Sidebar({ onViewChange, currentView, onNewChat }) {
-    return (
-        <div className="w-64 bg-gray-900 text-white p-4">
-            <h2 className="text-lg font-bold mb-4">
-                Policy Assistant
-            </h2>
+import { MessageCircle, History, Upload, BarChart3 } from 'lucide-react';
 
-            <div className="space-y-2">
-                <button
-                    onClick={onNewChat}
-                    className="w-full p-2 rounded bg-green-600 hover:bg-green-700 text-left"
-                >
-                    + New Chat
-                </button>
+const Sidebar = ({ currentPage, setCurrentPage }) => {
+  const menuItems = [
+    { id: 'chat', label: 'Chat', icon: MessageCircle },
+    { id: 'chat-history', label: 'Chat History', icon: History },
+    { id: 'upload', label: 'Upload Documents', icon: Upload },
+    { id: 'admin', label: 'Admin', icon: BarChart3 },
+  ];
 
-                <button
-                    onClick={() => onViewChange('chat')}
-                    className={`w-full p-2 rounded text-left ${
-                        currentView === 'chat' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                >
-                    💬 Chat
-                </button>
+  return (
+    <div className="w-64 bg-white shadow-lg border-r border-gray-200">
+      <div className="p-6">
+        <h2 className="text-xl font-semibold text-gray-800">Academic Assistant</h2>
+      </div>
+      <nav className="mt-6">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setCurrentPage(item.id)}
+              className={`w-full flex items-center px-6 py-3 text-left transition-colors duration-200 ${
+                currentPage === item.id
+                  ? 'bg-indigo-50 text-indigo-700 border-r-2 border-indigo-700'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon className="w-5 h-5 mr-3" />
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+    </div>
+  );
+};
 
-                <button
-                    onClick={() => onViewChange('admin')}
-                    className={`w-full p-2 rounded text-left ${
-                        currentView === 'admin' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                >
-                    ⚙️ Admin
-                </button>
-            </div>
-        </div>
-    )
-}
+export default Sidebar;

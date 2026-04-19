@@ -164,10 +164,10 @@ User Response + Citations
 | **Linting** | ESLint | Code quality |
 
 ### DevOps & Storage
-- **Vector Storage**: `data/vectorstore/faiss_index/`
-- **Document Storage**: `data/raw/` (university policies)
-- **Processed Data**: `data/processed/`
-- **Logs**: `data/logs/` (failed_queries.json)
+- **Vector Storage**: `Backend/data/vectorstore/faiss_index/`
+- **Document Storage**: `Backend/data/raw/` (university policies)
+- **Processed Data**: `Backend/data/processed/`
+- **Logs**: `Backend/data/logs/` (failed_queries.json)
 
 ---
 
@@ -205,7 +205,7 @@ Project/
 │   │       │   └── retriever.py    # FAISS vector search
 │   │       │
 │   │       ├── generation/          # LLM response generation
-│   │       │   ├── llm.py          # Ollama integration
+│   │       │   ├── llm.py          # Groq integration
 │   │       │   ├── generator.py    # Response generation
 │   │       │   └── prompt.py       # Prompt templates
 │   │       │
@@ -247,51 +247,46 @@ Project/
 │   │       └── failed_queries.json
 │   │
 │   ├── tests/                      # Unit and integration tests
-│   ├── scripts/                    # Utility scripts
-│   ├── notebooks/                  # Jupyter notebooks (analysis)
+│   ├── .env                        # Environment configuration
+│   ├── .env.example                # Environment template
+│   ├── Procfile                    # Heroku deployment
+│   ├── README.md                   # Backend documentation
+│   ├── render-deploy.sh            # Render deployment script
+│   ├── render.yaml                 # Render configuration
 │   ├── requirements.txt            # Python dependencies
-│   └── README.md                   # Backend README
+│   └── run_server.py              # Development server script
 │
-├── frontend/                        # React + Vite frontend
+├── Frontend/                        # React + Vite frontend
 │   ├── src/
-│   │   ├── main.jsx               # App entry point
 │   │   ├── App.jsx                # Root component
-│   │   ├── App.css                # Global styles
-│   │   │
-│   │   ├── pages/
-│   │   │   └── ChatPage.jsx       # Main chat interface
+│   │   ├── index.css              # Global styles
+│   │   ├── main.jsx               # App entry point
 │   │   │
 │   │   ├── components/            # Reusable components
-│   │   │   ├── ChatWindow.jsx     # Chat conversation area
-│   │   │   ├── MessageBubble.jsx  # Message display
-│   │   │   ├── Sidebar.jsx        # Navigation sidebar
-│   │   │   ├── AdminWindow.jsx    # Admin panel
-│   │   │   ├── SourceViewer.jsx   # Citation source viewer
-│   │   │   └── TypingIndicator.jsx # Loading indicator
+│   │   │   └── Sidebar.jsx        # Navigation sidebar
 │   │   │
-│   │   ├── admin/                 # Admin pages
-│   │   │   ├── AdminPage.jsx      # Admin dashboard
-│   │   │   ├── UploadPanel.jsx    # Document upload
-│   │   │   ├── FailedQueries.jsx  # Failed query tracking
-│   │   │   ├── MetricsPanel.jsx   # Analytics
-│   │   │   └── TicketsPanel.jsx   # Escalation tickets
+│   │   ├── pages/                 # Page components
+│   │   │   ├── Admin.jsx          # Admin dashboard
+│   │   │   ├── Chat.jsx           # Main chat interface
+│   │   │   ├── ChatHistory.jsx    # Chat history viewer
+│   │   │   ├── Landing.jsx        # Landing page
+│   │   │   └── Upload.jsx         # Document upload page
 │   │   │
-│   │   ├── hooks/
-│   │   │   └── useChat.js         # Chat state management
-│   │   │
-│   │   ├── services/
-│   │   │   └── api.js             # API client (axios)
-│   │   │
-│   │   ├── assets/                # Images, icons
-│   │   └── index.css              # Global styles
-│   │
 │   ├── public/                    # Static assets
-│   ├── package.json               # NPM dependencies
-│   ├── vite.config.js            # Vite configuration
-│   ├── tailwind.config.js         # Tailwind configuration
+│   │   ├── favicon.svg
+│   │   ├── icons.svg
+│   │   └── index.html
+│   │
+│   ├── .gitignore                 # Git ignore rules
 │   ├── eslint.config.js           # ESLint configuration
-│   └── README.md                  # Frontend README
+│   ├── index.html                 # HTML template
+│   ├── package.json               # NPM dependencies
+│   ├── package-lock.json          # NPM lock file
+│   ├── postcss.config.js          # PostCSS configuration
+│   ├── README.md                  # Frontend documentation
+│   └── vite.config.js            # Vite configuration
 │
+├── .gitignore                      # Root git ignore rules
 └── README.md                       # This file
 ```
 
@@ -302,9 +297,7 @@ Project/
 - **Python 3.10+** (for backend)
 - **Node.js 18+** (for frontend)
 - **npm or yarn** (package manager)
-- **Ollama** with Mistral model installed
-  - Install: [ollama.ai](https://ollama.ai)
-  - Pull model: `ollama pull mistral`
+- **Groq API Key** (get from [Groq Console](https://console.groq.com/keys))
 
 ### Recommended System Requirements
 - **RAM**: 8GB minimum (16GB for smooth operation)
@@ -344,13 +337,13 @@ pip install -r requirements.txt
 - `faiss-cpu`: Vector similarity search
 - `sentence-transformers`: Text embeddings
 - `pypdf` & `pdfplumber`: PDF parsing
-- `tiktoken`: Token counting
+- `groq`: Cloud LLM API client
 - `python-dotenv`: Environment variable management
 
 ### 3. Frontend Setup
 
 ```bash
-cd frontend
+cd Frontend
 
 # Install dependencies
 npm install
@@ -362,6 +355,7 @@ npm install
 - `tailwindcss`: Styling
 - `framer-motion`: Animations
 - `axios`: HTTP client
+- `recharts`: Data visualization
 
 ---
 
@@ -372,10 +366,10 @@ npm install
 Create a `.env` file in the `Backend/` directory:
 
 ```env
-# LLM Configuration
-OLLAMA_MODEL=mistral
-OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_TEMPERATURE=0.2
+# Groq API Configuration
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama3-8b-8192
+GROQ_TEMPERATURE=0.2
 
 # Vector Store Configuration
 FAISS_INDEX_PATH=./data/vectorstore/faiss_index
@@ -407,22 +401,14 @@ Modify if your backend runs on a different host/port.
 
 ## 🏃 Running the Application
 
-### Step 1: Start Ollama
+### Step 1: Configure Environment
 
-```bash
-# Terminal 1: Start Ollama service
-ollama serve
-
-# In another terminal, ensure Mistral model is available:
-ollama pull mistral
-```
-
-Ollama will be available at `http://localhost:11434`
+Ensure you have your Groq API key and have created the `.env` file in the Backend directory as described in the Configuration section.
 
 ### Step 2: Start Backend
 
 ```bash
-# Terminal 2: Navigate to Backend
+# Terminal 1: Navigate to Backend
 cd Backend
 
 # Activate virtual environment (if not already active)
@@ -430,7 +416,7 @@ venv\Scripts\activate  # Windows
 source venv/bin/activate  # macOS/Linux
 
 # Run FastAPI server
-python -m uvicorn app.api.main:app --reload --host 0.0.0.0 --port 8000
+python run_server.py
 ```
 
 Backend will be available at `http://localhost:8000`
@@ -440,8 +426,8 @@ Backend will be available at `http://localhost:8000`
 ### Step 3: Start Frontend
 
 ```bash
-# Terminal 3: Navigate to frontend
-cd frontend
+# Terminal 2: Navigate to Frontend
+cd Frontend
 
 # Start development server
 npm run dev
@@ -577,9 +563,9 @@ Uses FAISS for fast semantic similarity search:
 
 ### 3. **Generation** (`app/rag/generation/`)
 
-Integrates with Ollama for local LLM inference:
+Integrates with Groq for cloud LLM inference:
 ```python
-# Prompt + Context → Ollama/Mistral → Structured Response
+# Prompt + Context → Groq/Llama 3 → Structured Response
 ```
 
 **Temperature**: 0.2 (low) for factual, consistent responses
@@ -728,11 +714,11 @@ npm run build
 
 ## �🚨 Troubleshooting
 
-### Ollama Connection Error
+### Groq API Connection Error
 ```
-Error: Failed to connect to Ollama at http://localhost:11434
+Error: Failed to connect to Groq API
 ```
-**Solution**: Ensure Ollama is running (`ollama serve`)
+**Solution**: Check your `GROQ_API_KEY` in Backend `.env` file
 
 ### CORS Error in Frontend
 ```
@@ -753,7 +739,7 @@ MemoryError: Unable to allocate memory
 **Solution**: 
 - Reduce chunk size
 - Reduce context window
-- Use GPU (if available)
+- Use smaller model if needed
 
 ---
 
@@ -785,4 +771,4 @@ For issues, questions, or improvements:
 
 ---
 
-**Last Updated**: March 22, 2024
+**Last Updated**: April 19, 2026
